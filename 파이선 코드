@@ -1,0 +1,19 @@
+import getpass                                 #암호를 화면에 표시하지 않고 안전하게 입력할 수 있는 방법을 제공
+import telnetlib                               #텔넷 프로토콜 작업을 위한 클래스와 메서드를 제공
+
+HOST = "localhost" 
+user = input("Enter your remote account: ")    #원격 계정 입력 받기
+password = getpass.getpass()                   #비밀번호 입력 받기 (안보이게)
+
+tn = telnetlib.Telnet(HOST)                    #Telnet 객체 생성, 텔넷 연결을 만드는 데 사용
+
+tn.read_until(b"login: ")                      # "login: " 메시지가 나타날 때까지 대기
+tn.write(user.encode('ascii') + b"\n")         #사용자 이름을 아스키로 인코딩하여 전송
+if password:
+    tn.read_until(b"Password: ")               #"Password: " 메시지가 나타날 때까지 대기
+    tn.write(password.encode('ascii') + b"\n") #비밀번호를 아스키로 인코딩하여 전송
+
+tn.write(b"ls\n")                              #"ls" 명령어 전송
+tn.write(b"exit\n")                            #"exit" 명령어 전송
+
+print(tn.read_all().decode('ascii'))           #받은 모든 데이터를 아스키로 디코딩하여 출력
