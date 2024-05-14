@@ -1,0 +1,48 @@
+import telnetlib
+import time
+
+HOST = "10.1.1.21"
+PORT = 23  # 텔넷 기본 포트 23, 변경된 포트가 있다면 여기에 설정
+
+user = "ccnp"
+password = "cisco"
+
+# 최대 재시도 횟수 설정
+max_attempts = 3
+attempt = 0
+
+# 타임아웃 시간 (30초로 조정)
+timeout = 30
+
+while attempt < max_attempts:
+    tn = None  # Ensure tn is always defined
+    try:
+        tn = telnetlib.Telnet(HOST, PORT, timeout=timeout)
+        tn.read_until(b"Username: ", timeout=timeout)
+        tn.write(user.encode('ascii') + b"\n")
+
+        if password:
+            tn.read_until(b"Password: ", timeout=timeout)
+            tn.write(password.encode('ascii') + b"\n")
+
+        # 네트워크 설정 변경 명령어 입력
+        tn.write(b"sh ip int br\n")
+        tn.write(b"conf t\n")
+        tn.write(b"int l0\n")
+        tn.write(b"ip add 1.1.1.1 255.255.255.0\n")
+        tn.write(b"end\n")
+        tn.write(b"sh ip int br\n")
+        tn.write(b"exit\n")
+
+        # 결과 출력
+        output = tn.read_all().decode('ascii')
+        print(output)
+        break  # 명령 실행 완료 후 루프 종료
+    except (EOFError, ConnectionRefusedError, OSError) as e:
+        print(f"An error occurred: {e}")
+        attempt += 1
+        print(f"Attempting to reconnect... ({attempt}/{max_attempts})")
+        time.sleep(5)  # 재시도 전 5초 대기
+    finally:
+        if tn:
+            tn.close()
