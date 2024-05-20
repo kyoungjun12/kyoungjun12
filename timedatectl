@@ -1,0 +1,9 @@
+---
+- name: setup timezone
+  hosts: nodes
+  gather_facts: no
+  become: yes
+
+  tasks:
+    - name: set timezone
+      timezone: name=Asia/Tokyo
