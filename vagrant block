@@ -1,0 +1,14 @@
+---
+- name: ansible IP
+  hosts: localhost
+  gather_facts: no
+
+  tasks: 
+    - name: /etc/ansible/hosts
+      blockinfile:
+        path: /etc/ansible/hosts
+        block: |
+          [nodes]
+          192.168.1.10
+          192.168.1.11
+          192.168.1.12
