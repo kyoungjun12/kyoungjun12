@@ -1,0 +1,43 @@
+---
+- name: nsfs server
+  hosts: sb
+  gather_facts: no
+
+  tasks:
+    - name: make nfs dir
+      file:
+        path: /nfs
+        state: directory
+        mode: 0777
+
+    - name: configure exports
+      become: yes
+      lineinfile:
+        path: /etc/exports
+        line: /nfs 192.168.111.0/24(rw,sync,no_root_squash)
+
+    - name: nfs service
+      become: yes
+      service:
+        name: nfs
+        state: restarted
+
+    - name: setup nfs
+      hosts: sb
+      gather_facts: no
+
+      tasks:
+        - name: mk nfs_client
+          file:
+            path: /nfsclient
+            state: directory
+
+        - name: mount point
+          become: yes
+          mount:
+            path: /nfsclient
+            src: 192.168.111.100:/nfs
+            fstype: nfs
+            opts: nfsvers=3
+            state: mounted
+~                                         
