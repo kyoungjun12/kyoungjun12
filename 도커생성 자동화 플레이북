@@ -1,0 +1,10 @@
+---
+- hosts: ansible
+
+  tasks:
+    - name: docker image
+      command: docker build -t 4glapp:latest .
+      args:
+        chdir: /opt/docker
+~
+~
