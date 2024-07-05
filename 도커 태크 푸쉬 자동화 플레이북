@@ -1,0 +1,14 @@
+---
+- hosts: ansible
+
+  tasks:
+    - name: docker image
+      command: docker build -t 4glapp:latest .
+      args:
+        chdir: /opt/docker
+
+    - name: tag
+      command: docker tag 4glapp:latest leoeoeoeoo/4glapp:latest
+
+    - name: push
+      command: docker push leoeoeoeoo/4glapp:latest
